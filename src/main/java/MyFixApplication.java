@@ -1,6 +1,11 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.ReferenceRate;
+import net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.RequestCommoditiesForwardMultiExoticForward;
+import net.disactor.fixtest.Credit.RequestCreditSwapIndex.Header;
+import net.disactor.fixtest.Credit.RequestCreditSwapIndex.RequestCreditSwapIndex;
+import net.disactor.fixtest.Equity.RequestEquityOptionSingleName.RequestEquityOptionSingleName;
 import net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.RequestForeignExchangeForwardForward;
 import net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.Attributes;
 import net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.RequestRatesSwapFixedFloat;
@@ -14,6 +19,7 @@ import quickfix.fix50sp2.component.SecurityXML;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class MyFixApplication implements Application {
@@ -58,6 +64,79 @@ public class MyFixApplication implements Application {
 
         }
     }
+
+    public void createCommodity() throws SessionNotFound, JsonProcessingException {
+
+        RequestCommoditiesForwardMultiExoticForward instrument = new RequestCommoditiesForwardMultiExoticForward();
+        instrument.setHeader(new net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.Header());
+        instrument.getHeader().setAssetClass(net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.Header.AssetClass.COMMODITIES);
+        instrument.getHeader().setInstrumentType(net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.Header.InstrumentType.FORWARD);
+        instrument.getHeader().setLevel(net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.Header.Level.INST_REF_DATA_REPORTING);
+        instrument.getHeader().setUseCase(net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.Header.UseCase.MULTI_EXOTIC_FORWARD);
+
+        instrument.setAttributes(new net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.Attributes());
+
+        instrument.getAttributes().setExpiryDate("2017-12-31");
+        instrument.getAttributes().setNotionalCurrency(net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.Attributes.NotionalCurrency.DKK);
+        instrument.getAttributes().setDeliveryType(net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.Attributes.DeliveryType.CASH);
+        instrument.getAttributes().setReturnorPayoutTrigger(net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.Attributes.ReturnorPayoutTrigger.CONTRACT_FOR_DIFFERENCE_CFD);
+        instrument.getAttributes().setTransactionType(net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.Attributes.TransactionType.CRCK);
+        instrument.getAttributes().setFinalPriceType(net.disactor.fixtest.Commodities.RequestCommoditiesForwardMultiExoticForward.Attributes.FinalPriceType.ARGM);
+        instrument.getAttributes().setReferenceRate(new HashSet<ReferenceRate>() {{
+            add(ReferenceRate.ELECTRICITY_NYISO_ZONE_E_DAY_AHEAD);
+        }});
+
+        sendInstrumentRequest(instrument);
+    }
+
+    public void createEquity() throws SessionNotFound, JsonProcessingException {
+
+        RequestEquityOptionSingleName instrument = new RequestEquityOptionSingleName();
+        instrument.setHeader(new net.disactor.fixtest.Equity.RequestEquityOptionSingleName.Header());
+        instrument.getHeader().setAssetClass(net.disactor.fixtest.Equity.RequestEquityOptionSingleName.Header.AssetClass.EQUITY);
+        instrument.getHeader().setInstrumentType(net.disactor.fixtest.Equity.RequestEquityOptionSingleName.Header.InstrumentType.OPTION);
+        instrument.getHeader().setLevel(net.disactor.fixtest.Equity.RequestEquityOptionSingleName.Header.Level.INST_REF_DATA_REPORTING);
+        instrument.getHeader().setUseCase(net.disactor.fixtest.Equity.RequestEquityOptionSingleName.Header.UseCase.SINGLE_NAME);
+
+        instrument.setAttributes(new net.disactor.fixtest.Equity.RequestEquityOptionSingleName.Attributes());
+
+        instrument.getAttributes().setExpiryDate("2017-12-31");
+        instrument.getAttributes().setNotionalCurrency(net.disactor.fixtest.Equity.RequestEquityOptionSingleName.Attributes.NotionalCurrency.DKK);
+        instrument.getAttributes().setOptionType(net.disactor.fixtest.Equity.RequestEquityOptionSingleName.Attributes.OptionType.CALL);
+        instrument.getAttributes().setOptionExerciseStyle(net.disactor.fixtest.Equity.RequestEquityOptionSingleName.Attributes.OptionExerciseStyle.AMER);
+        instrument.getAttributes().setValuationMethodorTrigger(net.disactor.fixtest.Equity.RequestEquityOptionSingleName.Attributes.ValuationMethodorTrigger.ASIAN);
+        instrument.getAttributes().setDeliveryType(net.disactor.fixtest.Equity.RequestEquityOptionSingleName.Attributes.DeliveryType.CASH);
+        instrument.getAttributes().setUnderlyingInstrumentISIN(new HashSet<String>() {{
+            add("EZ7B57CQ1M32");
+        }});
+        instrument.getAttributes().setStrikePrice(3.14159);
+
+        sendInstrumentRequest(instrument);
+    }
+
+    public void createCredit() throws SessionNotFound, JsonProcessingException {
+
+        RequestCreditSwapIndex instrument = new RequestCreditSwapIndex();
+        instrument.setHeader(new Header());
+        instrument.getHeader().setAssetClass(Header.AssetClass.CREDIT);
+        instrument.getHeader().setInstrumentType(Header.InstrumentType.SWAP);
+        instrument.getHeader().setLevel(Header.Level.INST_REF_DATA_REPORTING);
+        instrument.getHeader().setUseCase(Header.UseCase.INDEX);
+
+        instrument.setAttributes(new net.disactor.fixtest.Credit.RequestCreditSwapIndex.Attributes());
+
+        instrument.getAttributes().setExpiryDate("2017-12-31");
+        instrument.getAttributes().setNotionalCurrency(net.disactor.fixtest.Credit.RequestCreditSwapIndex.Attributes.NotionalCurrency.DKK);
+        instrument.getAttributes().setUnderlyingInstrumentIndex(net.disactor.fixtest.Credit.RequestCreditSwapIndex.Attributes.UnderlyingInstrumentIndex.CUSTOM_INDEX);
+        instrument.getAttributes().setUnderlyingInstrumentIndexTermUnit(net.disactor.fixtest.Credit.RequestCreditSwapIndex.Attributes.UnderlyingInstrumentIndexTermUnit.DAYS);
+        instrument.getAttributes().setUnderlyingInstrumentIndexTermValue(42);
+        instrument.getAttributes().setUnderlyingCreditIndexSeries(13);
+        instrument.getAttributes().setUnderlyingCreditIndexVersion(31);
+        instrument.getAttributes().setUnderlyingIssuerType(net.disactor.fixtest.Credit.RequestCreditSwapIndex.Attributes.UnderlyingIssuerType.CORPORATE);
+
+        sendInstrumentRequest(instrument);
+    }
+
 
     public void createRates() throws SessionNotFound, JsonProcessingException {
 
