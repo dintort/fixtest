@@ -54,8 +54,21 @@ public class MyFixApplication implements Application {
                     socketInitiator.stop();
                     System.exit(0);
                 } else {
-                    Method method = this.getClass().getMethod(command);
-                    method.invoke(this);
+                    String[] split = command.split(" ");
+                    String commandName = split[0];
+                    if (split.length > 1) {
+                        String[] args = new String[split.length - 1];
+                        System.arraycopy(split, 1, args, 0, args.length);
+                        Class[] argTypes = new Class[args.length];
+                        for (int i = 0; i < argTypes.length; i++) {
+                            argTypes[i] = String.class;
+                        }
+                        Method method = this.getClass().getMethod(commandName, argTypes);
+                        method.invoke(this, args);
+                    } else {
+                        Method method = this.getClass().getMethod(commandName);
+                        method.invoke(this);
+                    }
                 }
 
             } catch (Exception e) {
@@ -65,11 +78,7 @@ public class MyFixApplication implements Application {
         }
     }
 
-    public void searchRates() throws SessionNotFound {
-        sendIsinSearchRequest("EZB6ZSG1NG20");
-    }
-
-    private void sendIsinSearchRequest(String isin) throws SessionNotFound {
+    public void search(String isin) throws SessionNotFound {
 
         SecurityDefinitionRequest request = new SecurityDefinitionRequest();
 
