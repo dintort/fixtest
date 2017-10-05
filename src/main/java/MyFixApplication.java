@@ -65,6 +65,26 @@ public class MyFixApplication implements Application {
         }
     }
 
+    public void searchRates() throws SessionNotFound {
+        sendIsinSearchRequest("EZB6ZSG1NG20");
+    }
+
+    private void sendIsinSearchRequest(String isin) throws SessionNotFound {
+
+        SecurityDefinitionRequest request = new SecurityDefinitionRequest();
+
+        request.set(new SecurityReqID(UUID.randomUUID().toString()));
+        request.set(new SecurityRequestType(SecurityRequestType.REQUEST_SECURITY_IDENTITY_AND_SPECIFICATIONS));
+        request.set(new Symbol("N/A"));
+        request.set(new SecurityID(isin));
+        request.set(new SecurityIDSource(SecurityIDSource.ISIN_NUMBER));
+
+        Session.sendToTarget(request, sessionId);
+
+    }
+
+
+
     public void createCommodity() throws SessionNotFound, JsonProcessingException {
 
         RequestCommoditiesForwardMultiExoticForward instrument = new RequestCommoditiesForwardMultiExoticForward();
