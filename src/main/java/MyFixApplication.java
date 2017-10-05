@@ -1,9 +1,9 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Attributes;
-import net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Header;
 import net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.RequestForeignExchangeForwardForward;
+import net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.Attributes;
+import net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.RequestRatesSwapFixedFloat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quickfix.*;
@@ -13,6 +13,7 @@ import quickfix.fix50sp2.component.SecurityXML;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 public class MyFixApplication implements Application {
@@ -37,46 +38,71 @@ public class MyFixApplication implements Application {
     private void command() {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
-            log.info("Please enter command");
             try {
+                log.info("Please enter command");
                 String command = input.readLine();
                 if (command == null) {
                     continue;
                 }
-                if (command.startsWith("createfx")) {
-                    createFx();
-                } else if (command.startsWith("exit")) {
+                if (command.startsWith("exit")) {
                     socketInitiator.stop();
                     System.exit(0);
                 } else {
-                    log.info("Unsupported command: " + command);
+                    Method method = this.getClass().getMethod(command);
+                    method.invoke(this);
                 }
 
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
-                return;
             }
 
         }
     }
 
-    private void createFx() throws SessionNotFound, JsonProcessingException {
+    public void createRates() throws SessionNotFound, JsonProcessingException {
 
-        RequestForeignExchangeForwardForward instrument = new RequestForeignExchangeForwardForward();
-        Header header = new Header();
+        RequestRatesSwapFixedFloat instrument = new RequestRatesSwapFixedFloat();
+        net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.Header header = new net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.Header();
         instrument.setHeader(header);
-        header.setAssetClass(Header.AssetClass.FOREIGN_EXCHANGE);
-        header.setInstrumentType(Header.InstrumentType.FORWARD);
-        header.setLevel(Header.Level.INST_REF_DATA_REPORTING);
-        header.setUseCase(Header.UseCase.FORWARD);
+        header.setAssetClass(net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.Header.AssetClass.RATES);
+        header.setInstrumentType(net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.Header.InstrumentType.SWAP);
+        header.setLevel(net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.Header.Level.INST_REF_DATA_REPORTING);
+        header.setUseCase(net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.Header.UseCase.FIXED_FLOAT);
 
-        Attributes attributes = new Attributes();
+        net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.Attributes attributes = new net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.Attributes();
         instrument.setAttributes(attributes);
 
         attributes.setExpiryDate("2017-12-31");
-        attributes.setNotionalCurrency(Attributes.NotionalCurrency.EUR);
-        attributes.setOtherNotionalCurrency(Attributes.OtherNotionalCurrency.DKK);
+        attributes.setNotionalCurrency(net.disactor.fixtest.Rates.RequestRatesSwapFixedFloat.Attributes.NotionalCurrency.EUR);
+        attributes.setReferenceRate(Attributes.ReferenceRate.CAD_ISDA_SWAP_RATE);
+        attributes.setReferenceRateTermValue(42);
+        attributes.setReferenceRateTermUnit(Attributes.ReferenceRateTermUnit.DAYS);
+        attributes.setNotionalSchedule(Attributes.NotionalSchedule.ACCRETING);
 
+        sendInstrumentRequest(instrument);
+    }
+
+    public void createFx() throws SessionNotFound, JsonProcessingException {
+
+        RequestForeignExchangeForwardForward instrument = new RequestForeignExchangeForwardForward();
+        net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Header header = new net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Header();
+        instrument.setHeader(header);
+        header.setAssetClass(net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Header.AssetClass.FOREIGN_EXCHANGE);
+        header.setInstrumentType(net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Header.InstrumentType.FORWARD);
+        header.setLevel(net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Header.Level.INST_REF_DATA_REPORTING);
+        header.setUseCase(net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Header.UseCase.FORWARD);
+
+        net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Attributes attributes = new net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Attributes();
+        instrument.setAttributes(attributes);
+
+        attributes.setExpiryDate("2017-12-31");
+        attributes.setNotionalCurrency(net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Attributes.NotionalCurrency.EUR);
+        attributes.setOtherNotionalCurrency(net.disactor.fixtest.Foreign_Exchange.RequestForeignExchangeForwardForward.Attributes.OtherNotionalCurrency.DKK);
+
+        sendInstrumentRequest(instrument);
+    }
+
+    private void sendInstrumentRequest(Object instrument) throws JsonProcessingException, SessionNotFound {
         String requestJson = jsonWriter.forType(instrument.getClass()).writeValueAsString(instrument);
 
         SecurityDefinitionRequest request = new SecurityDefinitionRequest();
