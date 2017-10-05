@@ -1,0 +1,16 @@
+build
+out
+.idea/*.*
+.idea/copyright
+.idea/dictionaries
+.idea/inspectionProfiles
+.idea/libraries
+.idea/modules
+.idea/scopes
+.idea/shelf
+.idea/dataSources
+.idea/aritfacts
+*.iml
+*.iws
+generated
+logs

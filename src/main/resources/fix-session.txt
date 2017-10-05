@@ -1,0 +1,27 @@
+[DEFAULT]# Settings which apply to all the Sessions.
+ConnectionType=initiator
+LogonTimeout=60
+ReconnectInterval=60
+ResetOnLogon=Y
+[SESSION]# Settings specifically for one session
+BeginString=FIXT.1.1
+DefaultApplVerID=FIX.5.0SP2
+SenderCompID=
+SenderSubID=FC-MR
+TargetCompID=DSB
+TargetSubID=UAT
+StartDay=sunday
+StartTime=12:00:00
+EndDay=saturday
+EndTime=12:00:00
+TimeZone=UTC
+HeartBtInt=30
+CheckLatency=N
+MaxLatency=240
+UseDataDictionary=N
+MillisecondsInTimeStamp=Y
+SocketConnectPort=2040
+SocketConnectHost=certs.anna-dsb.com
+SocketUseSSL=Y
+SocketTcpNoDelay=Y
+SocketKeepAlive=Y
