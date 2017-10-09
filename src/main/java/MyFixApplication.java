@@ -79,6 +79,28 @@ public class MyFixApplication implements Application {
         }
     }
 
+    public void malformed() throws SessionNotFound {
+        SecurityDefinitionRequest request = new SecurityDefinitionRequest();
+
+        request.set(new SecurityReqID(UUID.randomUUID().toString()));
+        request.set(new SecurityRequestType(SecurityRequestType.REQUEST_SECURITY_IDENTITY_FOR_THE_SPECIFICATIONS_PROVIDED));
+        request.set(new Symbol("N/A"));
+
+        SecurityXML securityXml = new SecurityXML();
+        String requestJson = "blahblahblah";
+        securityXml.set(new SecurityXMLData(requestJson));
+        securityXml.set(new SecurityXMLLen(requestJson.length()));
+        request.set(securityXml);
+
+        Session.sendToTarget(request, sessionId);
+
+    }
+
+    public void subscribe2() throws SessionNotFound {
+        subscribe("1", "0");
+        subscribe("1", "0");
+    }
+
     public void subscribe(String assetClass, String requestType) throws SessionNotFound {
         SecurityListRequest request = new SecurityListRequest();
 
@@ -86,6 +108,8 @@ public class MyFixApplication implements Application {
         request.set(new SecurityListRequestType(SecurityRequestType.REQUEST_LIST_SECURITY_TYPES));
         request.setString(1938, assetClass);
         request.set(new SubscriptionRequestType(requestType.charAt(0)));
+        request.set(new Text("thisisthetext"));
+        request.setField(new ApplSeqNum(1));
 
         Session.sendToTarget(request, sessionId);
     }
@@ -213,6 +237,11 @@ public class MyFixApplication implements Application {
         sendInstrumentRequest(instrument);
     }
 
+    public void createFx2() throws SessionNotFound, JsonProcessingException {
+        createFx();
+        createFx();
+    }
+
     public void createFx() throws SessionNotFound, JsonProcessingException {
 
         RequestForeignExchangeForwardForward instrument = new RequestForeignExchangeForwardForward();
@@ -239,7 +268,8 @@ public class MyFixApplication implements Application {
         SecurityDefinitionRequest request = new SecurityDefinitionRequest();
 
         request.set(new SecurityReqID(UUID.randomUUID().toString()));
-        request.set(new SecurityRequestType(SecurityRequestType.REQUEST_SECURITY_IDENTITY_FOR_THE_SPECIFICATIONS_PROVIDED));
+//        request.set(new SecurityRequestType(SecurityRequestType.REQUEST_SECURITY_IDENTITY_FOR_THE_SPECIFICATIONS_PROVIDED));
+        request.set(new SecurityRequestType(4));
         request.set(new Symbol("N/A"));
 
         SecurityXML securityXml = new SecurityXML();
